@@ -11,7 +11,7 @@
     "build": "yarn build:config; yarn build:integration"
   },
   "devDependencies": {
-    "@chec/integration-handler": "^0.0.1",
+    "@chec/integration-handler": "^0.0.6",
     "@parcel/babel-plugin-transform-runtime": "^2.0.1",
     "@vercel/ncc": "^0.31.1",
     "contentful-management": "^7.45.0",

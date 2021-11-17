@@ -120,7 +120,6 @@ const handler: IntegrationHandler = async (request, context) => {
         responseType: 'json',
         json: {
           parameters: {
-            // @ts-ignore
             publicKey: context.publicKey,
           },
         },
