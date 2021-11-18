@@ -18,6 +18,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 const appUrl = 'https://contentful-app.chec.io';
 const handler = (request, context) => __awaiter(void 0, void 0, void 0, function* () {
     // This only runs on initial execution of an integration
+    if (request.body.event === 'integrations.create') {
+        return {
+            statusCode: 202,
+            body: ''
+        };
+    }
     if (request.body.event !== 'integrations.ready') {
         return {
             statusCode: 400,
@@ -113,8 +119,8 @@ const handler = (request, context) => __awaiter(void 0, void 0, void 0, function
     }, []);
     yield Promise.all(installationPromises);
     return {
-        statusCode: 204,
-        body: '',
+        statusCode: 200,
+        body: 'Successfully installed Commerce.js for Contentful to the configured spaces',
     };
 });
 module.exports = handler;

@@ -12,6 +12,13 @@ const appUrl = 'https://contentful-app.chec.io';
 
 const handler: IntegrationHandler = async (request, context) => {
   // This only runs on initial execution of an integration
+  if (request.body.event === 'integrations.create') {
+    return {
+      statusCode: 202,
+      body: ''
+    }
+  }
+
   if (request.body.event !== 'integrations.ready') {
     return {
       statusCode: 400,
@@ -139,8 +146,8 @@ const handler: IntegrationHandler = async (request, context) => {
   await Promise.all(installationPromises);
 
   return {
-    statusCode: 204,
-    body: '',
+    statusCode: 200,
+    body: 'Successfully installed Commerce.js for Contentful to the configured spaces',
   };
 };
 
