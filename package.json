@@ -10,7 +10,7 @@
   "scripts": {
     "serve": "parcel configuration-app/index.html",
     "build:config": "parcel build configuration-app/index.html --dist-dir dist/config",
-    "build:integration": "ncc build integration/index.ts -o dist/integration",
+    "build:integration": "ncc build integration/index.ts -m -o dist/integration",
     "build": "yarn build:config; yarn build:integration"
   },
   "devDependencies": {
