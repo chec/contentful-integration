@@ -5,7 +5,7 @@ import { OptionsOfJSONResponseBody } from 'got'
 interface ContentfulConfig {
   contentManagementApiKey: string;
   environmentName: string;
-  spaceIds: Array<string>;
+  selectedSpaces: Array<string>;
 }
 
 const appUrl = 'https://contentful-app.chec.io';
@@ -23,7 +23,7 @@ const handler: IntegrationHandler = async (request, context) => {
   const config: ContentfulConfig = integration.config;
 
   // Parse the list of chosen spaces into an object keyed by organisation ID
-  const spacesByOrg: { [orgId: string]: Array<string> } = config.spaceIds.reduce((acc: object, candidate) => {
+  const spacesByOrg: { [orgId: string]: Array<string> } = config.selectedSpaces.reduce((acc: object, candidate) => {
     // Parse the chosen space, which is a combined org ID and space ID. The regex (for individual IDs) comes from
     // Contentful documentation
     const result = candidate.match(/^o:([a-zA-Z0-9-_.]{1,64})==s:([a-zA-Z0-9-_.]{1,64})$/);
