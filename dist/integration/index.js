@@ -44,25 +44,26 @@ const handler = (request, context) => __awaiter(void 0, void 0, void 0, function
     }, {});
     // Find or create app definitions for each org
     const appDefinitionsByOrg = {};
+    const baseGotOptions = {
+        responseType: 'json',
+        headers: {
+            Authorization: `Bearer ${config.contentManagementApiKey}`,
+            'Content-Type': 'application/vnd.contentful.management.v1+json',
+        },
+    };
     const definitionResolutionPromises = Object.keys(spacesByOrg).map((orgId) => __awaiter(void 0, void 0, void 0, function* () {
         const definitionBaseUrl = `https://api.contentful.com/organizations/${orgId}/app_definitions`;
-        const gotOptions = {
-            headers: {
-                Authorization: `Bearer ${config.contentManagementApiKey}`,
-                'Content-Type': 'application/vnd.contentful.management.v1+json',
-            },
-        };
         // Avoid adding a Commerce.js app if one is already installed by searching the existing definitions
-        const { items } = yield context.got(definitionBaseUrl, gotOptions).json();
+        const { items } = yield context.got(definitionBaseUrl, baseGotOptions).json();
         // Look for an existing definition
-        const result = items.find((definition) => definition.src === appUrl);
+        const result = items.find((definition) => definition.src.startsWith(appUrl));
         if (result) {
             appDefinitionsByOrg[orgId] = result;
             return;
         }
         // Create a definition in other cases
         const options = {
-            method: 'PUT',
+            method: 'POST',
             responseType: 'json',
             json: {
                 name: 'Commerce.js App',
@@ -98,17 +99,13 @@ const handler = (request, context) => __awaiter(void 0, void 0, void 0, function
         return acc.concat(spaceIds.map((spaceId) => __awaiter(void 0, void 0, void 0, function* () {
             const appDefinition = appDefinitionsByOrg[orgId];
             const url = `https://api.contentful.com/spaces/${spaceId}/environments/${config.environmentName}/app_installations/${appDefinition.sys.id}`;
-            const options = {
-                method: 'PUT',
-                responseType: 'json',
-                json: {
+            const options = Object.assign(Object.assign({}, baseGotOptions), { method: 'PUT', json: {
                     parameters: {
                         publicKey: context.publicKey,
                     },
-                },
-            };
+                } });
             const response = yield context.got(url, options);
-            if (response.statusCode !== 201) {
+            if (response.statusCode < 200 || response.statusCode >= 300) {
                 // Relay the error message from Contentful
                 throw new Error(JSON.stringify(response.body));
             }

@@ -48,21 +48,23 @@ const handler: IntegrationHandler = async (request, context) => {
   // Find or create app definitions for each org
   const appDefinitionsByOrg: { [orgId: string]: AppDefinition } = {};
 
+  const baseGotOptions: OptionsOfJSONResponseBody = {
+    responseType: 'json',
+    headers: {
+      Authorization: `Bearer ${config.contentManagementApiKey}`,
+      'Content-Type': 'application/vnd.contentful.management.v1+json',
+    },
+  };
+
   const definitionResolutionPromises = Object.keys(spacesByOrg).map(async (orgId) => {
     const definitionBaseUrl = `https://api.contentful.com/organizations/${orgId}/app_definitions`;
-    const gotOptions = {
-      headers: {
-        Authorization: `Bearer ${config.contentManagementApiKey}`,
-        'Content-Type': 'application/vnd.contentful.management.v1+json',
-      },
-    };
 
     // Avoid adding a Commerce.js app if one is already installed by searching the existing definitions
-    const { items }: { items: Array<any> } = await context.got(definitionBaseUrl, gotOptions).json();
+    const { items }: { items: Array<any> } = await context.got(definitionBaseUrl, baseGotOptions).json();
 
     // Look for an existing definition
     const result = items.find(
-      (definition: AppDefinition) => definition.src === appUrl
+      (definition: AppDefinition) => definition.src.startsWith(appUrl)
     );
 
     if (result) {
@@ -72,7 +74,7 @@ const handler: IntegrationHandler = async (request, context) => {
 
     // Create a definition in other cases
     const options: OptionsOfJSONResponseBody = {
-      method: 'PUT',
+      method: 'POST',
       responseType: 'json',
       json: {
         name: 'Commerce.js App',
@@ -116,8 +118,8 @@ const handler: IntegrationHandler = async (request, context) => {
       const appDefinition = appDefinitionsByOrg[orgId];
       const url = `https://api.contentful.com/spaces/${spaceId}/environments/${config.environmentName}/app_installations/${appDefinition.sys.id}`;
       const options: OptionsOfJSONResponseBody = {
+        ...baseGotOptions,
         method: 'PUT',
-        responseType: 'json',
         json: {
           parameters: {
             publicKey: context.publicKey,
@@ -127,7 +129,7 @@ const handler: IntegrationHandler = async (request, context) => {
 
       const response = await context.got<AppInstallation>(url, options);
 
-      if (response.statusCode !== 201) {
+      if (response.statusCode < 200 || response.statusCode >= 300) {
         // Relay the error message from Contentful
         throw new Error(JSON.stringify(response.body));
       }
