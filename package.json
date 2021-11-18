@@ -4,6 +4,9 @@
   "description": "Automatically install and configure the Commerce.js Contentful app on your Contentful space from the Chec Dashboard",
   "author": "Chec Platform Ltd.",
   "license": "BSD-3-Clause",
+  "engines": {
+    "node": ">=12"
+  },
   "scripts": {
     "serve": "parcel configuration-app/index.html",
     "build:config": "parcel build configuration-app/index.html --dist-dir dist/config",
@@ -12,23 +15,13 @@
   },
   "devDependencies": {
     "@chec/integration-handler": "^0.0.6",
-    "@parcel/babel-plugin-transform-runtime": "^2.0.1",
     "@vercel/ncc": "^0.31.1",
     "contentful-management": "^7.45.0",
     "parcel": "^2.0.1",
     "typescript": "^4.4.4"
   },
   "dependencies": {
-    "@chec/integration-configuration-sdk": "^0.0.1"
-  },
-  "babel": {
-    "presets": [
-      "@parcel/babel-preset-env",
-      "@babel/preset-react"
-    ],
-    "plugins": [
-      "@parcel/babel-plugin-transform-runtime"
-    ]
+    "@chec/integration-configuration-sdk": "^0.0.3"
   },
   "browserslist": {
     "production": [

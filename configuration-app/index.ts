@@ -1,8 +1,5 @@
 import { createSDK } from '@chec/integration-configuration-sdk';
 
-import 'regenerator-runtime/runtime';
-const contentful = require('contentful-management');
-
 interface Option {
   value: string,
   label: string,
@@ -44,10 +41,19 @@ interface ContentfulConfig {
   };
 
   const updateSpacesDropdown = async (accessToken) => {
-    // Reset the client
-    const client = contentful.createClient({
-      accessToken,
+    // Load spaces from Contentful
+    const response = await fetch('https://api.contentful.com/spaces', {
+      mode: 'cors',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      },
     });
+
+    if (response.status !== 200) {
+      return;
+    }
+
+    const spaces = (await response.json()).items;
 
     // Asynchronously load organisations for the dropdown, and set the schema to have these new options
     sdk.setSchema([
@@ -55,7 +61,7 @@ interface ContentfulConfig {
       {
         ...spacesField,
         disabled: false,
-        options: (await client.getSpaces()).items.map((space) => ({
+        options: spaces.map((space) => ({
           value: `o:${space.sys.organization.sys.id}==s:${space.sys.id}`,
           label: space.name,
         }))
@@ -73,8 +79,6 @@ interface ContentfulConfig {
   sdk.onConfigUpdate(({
     contentManagementApiKey,
   }: ContentfulConfig) => {
-    console.log('hi');
-
     // Check if the key has changed and we should reset everything
     if (existingKey === contentManagementApiKey) {
       return;

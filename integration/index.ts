@@ -12,7 +12,7 @@ const appUrl = 'https://contentful-app.chec.io';
 
 const handler: IntegrationHandler = async (request, context) => {
   // This only runs on initial execution of an integration
-  if (request.body.event !== 'integration-ready') {
+  if (request.body.event !== 'integrations.ready') {
     return {
       statusCode: 400,
       body: 'The event that triggered this integration is unsupported.',
