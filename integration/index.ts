@@ -34,7 +34,7 @@ const handler: IntegrationHandler = async (request, context) => {
 
     const [_, org, space] = result;
     // Check if there's already a key for the org ID resolved
-    const existingOrg = Object.hasOwnProperty.call(acc, org) ? acc[org] : {};
+    const existingOrg = Object.hasOwnProperty.call(acc, org) ? acc[org] : [];
 
     return {
       ...acc,
