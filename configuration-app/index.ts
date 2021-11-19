@@ -19,7 +19,7 @@ interface ContentfulConfig {
     {
       key: 'contentManagementApiKey',
       label: 'Contentful Manangement API key',
-      type: 'short_text',
+      type: 'api_key',
       description: 'A Contentful Management API key is required to install the "Commerce.js for Contentful" app to your organisations, and configure the app on your selected spaces.',
     },
     {
