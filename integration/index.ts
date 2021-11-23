@@ -1,17 +1,13 @@
 import { IntegrationHandler } from '@chec/integration-handler';
 import { AppDefinition, AppInstallation } from 'contentful-management/types';
 import { OptionsOfJSONResponseBody } from 'got'
-
-interface ContentfulConfig {
-  contentManagementApiKey: string;
-  environmentName: string;
-  selectedSpaces: Array<string>;
-}
+import ContentfulConfig from '../config';
 
 const appUrl = 'https://contentful-app.chec.io';
 
 const handler: IntegrationHandler = async (request, context) => {
-  // This only runs on initial execution of an integration
+  // Right now, the integration is set to run on this event, as we need a webhook to attach to. It's not 100% that this
+  // integration will be scaffolded in time for this event, so we instead run the integration on the "ready" webhook
   if (request.body.event === 'integrations.create') {
     return {
       statusCode: 202,
@@ -19,6 +15,7 @@ const handler: IntegrationHandler = async (request, context) => {
     }
   }
 
+  // We don't watch for any other events except "integrations.ready"
   if (request.body.event !== 'integrations.ready') {
     return {
       statusCode: 400,
@@ -81,8 +78,8 @@ const handler: IntegrationHandler = async (request, context) => {
 
     // Create a definition in other cases
     const options: OptionsOfJSONResponseBody = {
+      ...baseGotOptions,
       method: 'POST',
-      responseType: 'json',
       json: {
         name: 'Commerce.js App',
         src: appUrl,
@@ -140,10 +137,14 @@ const handler: IntegrationHandler = async (request, context) => {
         // Relay the error message from Contentful
         throw new Error(JSON.stringify(response.body));
       }
+
+      return response.body;
     }));
   }, []);
 
   await Promise.all(installationPromises);
+
+  context.store.set('installed', true);
 
   return {
     statusCode: 200,
