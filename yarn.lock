@@ -221,10 +221,10 @@
     "@babel/helper-validator-identifier" "^7.15.7"
     to-fast-properties "^2.0.0"
 
-"@chec/integration-configuration-sdk@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@chec/integration-configuration-sdk/-/integration-configuration-sdk-0.0.3.tgz#42758ec696cbb018cee1dd3e58cea841fa5c7455"
-  integrity sha512-UX2HIXZYIQeVzurDy/hoAgCgFT0SG4UijL7ztwzW+dCtr2s/WnKfYsg2Rv32ruqiEdzU797hfIqJb9fpegVBjw==
+"@chec/integration-configuration-sdk@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@chec/integration-configuration-sdk/-/integration-configuration-sdk-0.0.4.tgz#4cc58accebcfcc271c92bd284b22b57bc7c0db2e"
+  integrity sha512-xIG0szzmloqH9hy2w2QDYnQotpMIhxDt+EPPGKQjfb50PK1SVdfDKTSfmhrhHRzkgtemEDBuXGlDjQL45Kbcjg==
   dependencies:
     postmate "^1.5.2"
     typescript "^4.4.4"

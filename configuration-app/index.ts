@@ -1,13 +1,5 @@
-import { createSDK } from '@chec/integration-configuration-sdk';
-
-interface Option {
-  value: string,
-  label: string,
-}
-
-interface ContentfulConfig {
-  contentManagementApiKey: string
-}
+import {createSDK, Schema, SchemaFieldTypes, SelectSchemaItem,} from '@chec/integration-configuration-sdk';
+import ContentfulConfig from '../config';
 
 (async () => {
   const sdk = await createSDK();
@@ -15,25 +7,59 @@ interface ContentfulConfig {
   // Track changes over time to the API key and chosen organisation
   let existingKey: string = '';
 
-  const baseFields = [
+  if (sdk.editMode) {
+    // Check if the integration is still running
+    // @ts-ignore
+    if (!Object.hasOwnProperty.call(sdk.config, 'installed') || !sdk.config.installed) {
+      sdk.setSchema([
+        {
+          type: SchemaFieldTypes.Html,
+          content: '<p>Please wait while the Commerce.js app is configured on contentful</p>',
+        }
+      ]);
+      return;
+    }
+
+    // Fix dashboard to not have excessive spacing around p tags
+    sdk.setSchema([
+      {
+        type: SchemaFieldTypes.Html,
+        content: `
+<p>Your contentful app is configured. When you create "short_text" content models, "Commerce.js" will appear under the
+appearance tab for your model.</p>
+<p>For more details, use the "Learn more" link on the right.</p>
+        `,
+      }
+    ]);
+
+    return;
+  }
+
+  const baseFields: Schema<ContentfulConfig> = [
+    {
+      type: SchemaFieldTypes.Html,
+      content: `
+<p><strong>This integration requires a Contentful personal access token.</strong> You can issue an access token
+<a href="https://app.contentful.com/account/profile/cma_tokens" target="_blank" rel="noopener noreferrer">here</a></p>
+      `,
+    },
     {
       key: 'contentManagementApiKey',
-      label: 'Contentful Manangement API key',
-      type: 'api_key',
-      description: 'A Contentful Management API key is required to install the "Commerce.js for Contentful" app to your organisations, and configure the app on your selected spaces.',
+      label: 'Personal access token',
+      type: SchemaFieldTypes.ApiKey,
     },
     {
       key: 'environmentName',
       label: 'Environment name',
-      type: 'short_text',
+      type: SchemaFieldTypes.ShortText,
       default: 'master',
       description: 'The "environment" to install the app to in Contentful. Currently only one shared environment name is supported across all spaces. You may create multiple integrations if more environments are required.'
     }
   ];
-  const spacesField = {
+  const spacesField: SelectSchemaItem<ContentfulConfig> = {
     key: 'selectedSpaces',
     label: 'Contentful spaces to install to',
-    type: 'select',
+    type: SchemaFieldTypes.Select,
     options: [],
     disabled: true,
     multiselect: true,
@@ -56,7 +82,7 @@ interface ContentfulConfig {
     const spaces = (await response.json()).items;
 
     // Asynchronously load organisations for the dropdown, and set the schema to have these new options
-    sdk.setSchema([
+    sdk.setSchema<ContentfulConfig>([
       ...baseFields,
       {
         ...spacesField,
