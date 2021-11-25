@@ -2,6 +2,10 @@
 
 Creates a Contentful app definition in your Contentful org, and installs to your Contentful spaces
 
+<p align="center">
+<img src="https://cdn.chec.io/chec-assets/integrations/contentful/contentful-cover.png" align="center" />
+</p>
+
 ## Configuration
 
 This integration provides a configuration app so that we can use the provided "management" API key to fetch available
